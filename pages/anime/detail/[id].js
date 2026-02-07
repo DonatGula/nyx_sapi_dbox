@@ -3,6 +3,8 @@ import Hls from 'hls.js';
 
 export default function DetailAnime() {
   // ... state sebelumnya (anime, servers, loading, dll) ...
+  const [videoUrl, setVideoUrl] = useState('');
+  const [selectedServer, setSelectedServer] = useState(null);
   const videoRef = useRef(null);
   const [isHls, setIsHls] = useState(false);
 
