@@ -1,0 +1,17 @@
+{
+  "name": "nyx-drama",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "axios": "latest",
+    "crypto-js": "latest",
+    "hls.js": "^1.6.15",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
