@@ -55,38 +55,31 @@ export default function DetailAnime() {
   }, [id]);
 
   // 2. Ambil List Server (Berdasarkan Klik Episode)
-  const fetchServers = async (epId) => {
+const fetchServers = async (epId) => {
   setSelectedEp(epId);
-  setLoading(true); // Kasih loading sebentar pas ganti episode
-  
   try {
+    console.log("Fetching servers for Ep:", epId);
     const res = await fetch(`/api/anime?path=anime/get-server-list`, {
       method: 'POST',
       body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
     });
     const json = await res.json();
-    const srvList = json.list || [];
+    console.log("Server List Response:", json);
+    
+    // PERBAIKAN: API Paman mengirim objek yang isinya ada properti 'list'
+    // Lihat di gambar console: { list: Array(3), serverurl: "...", quality: "SD" }
+    const srvList = json.list || []; 
     setServers(srvList);
-
+    
     if (srvList.length > 0) {
-      // --- LOGIKA AUTO-SELECT MULAI DI SINI ---
-      
-      // 1. Cari yang tipenya HLS (.m3u8) duluan karena paling stabil & tanpa blokir iframe
-      const bestServer = srvList.find(s => s.url.includes('.m3u8')) 
-                      || srvList.find(s => s.quality === 'HD') // 2. Kalau gak ada, cari yang HD
-                      || srvList[0]; // 3. Kalau gak ada juga, ambil yang paling pertama
-
-      console.log("Auto-selecting best server:", bestServer.server);
-      handleServerSelection(bestServer);
-      
-    } else {
-      setError("Duh, episode ini belum ada servernya Paman.");
+      // Kita pilih server pertama secara otomatis
+      const defaultServer = srvList[0];
+      setSelectedServer(defaultServer.id);
+      setVideoUrl(defaultServer.url);
+      setIsHls(defaultServer.url.includes('.m3u8'));
     }
   } catch (err) {
-    console.error("Gagal ambil server:", err);
-    setError("Koneksi server lagi bermasalah.");
-  } finally {
-    setLoading(false);
+    console.error("Gagal Load Servers:", err);
   }
 };
 
