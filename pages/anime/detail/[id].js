@@ -27,7 +27,7 @@ export default function DetailAnime() {
         setLoading(true);
         const res = await fetch('/api/anime?path=anime/detail', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'x-api-key': 'ThWmZq4t7w!z%C*F-JaNdRgUkXn2r5u8', },
           body: new URLSearchParams({ id: id }).toString()
         });
         const json = await res.json();
@@ -60,7 +60,7 @@ export default function DetailAnime() {
     try {
       const res = await fetch('/api/anime?path=anime/get-server-list', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'x-api-key': 'ThWmZq4t7w!z%C*F-JaNdRgUkXn2r5u8', },
         body: new URLSearchParams({ 
           id: episodeId, 
           animeID: id, 
