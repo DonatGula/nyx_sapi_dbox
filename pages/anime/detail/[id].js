@@ -78,7 +78,6 @@ const fetchServers = async (epId) => {
   }
 };
 
-
   const handleServerSelection = (srv) => {
     setSelectedServer(srv.id);
     setVideoUrl(srv.url);

@@ -12,7 +12,6 @@ export default async function handler(req, res) {
       bodyData = new URLSearchParams(parsedBody).toString();
     }
 
-    // 3. Tembak ke Server Vunime
     const response = await fetch(`https://air.vunime.my.id/mobinime/${path}`, {
       method: 'POST',
       headers: {
@@ -22,7 +21,6 @@ export default async function handler(req, res) {
       },
       body: bodyData,
     });
-
 
     const responseText = await response.text();
 
