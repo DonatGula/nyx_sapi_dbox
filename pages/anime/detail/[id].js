@@ -53,28 +53,33 @@ export default function DetailAnime() {
     initData();
   }, [id]);
 
-  const fetchServers = async (epId) => {
-    setSelectedEp(epId);
-    try {
-      console.log("Fetching servers for Ep:", epId);
-      const res = await fetch(`/api/anime?path=anime/get-server-list`, {
-        method: 'POST',
-        body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
-      });
-      const json = await res.json();
-      console.log("Server List Response:", json);
-      
-      const srvList = json.data || [];
-      setServers(srvList);
-      
-      if (srvList.length > 0) {
-        setVideoUrl(srvList[0].url);
-      }
-
-    } catch (err) {
-      console.error("Gagal Load Servers:", err);
+ const fetchServers = async (epId) => {
+  setSelectedEp(epId);
+  try {
+    console.log("Fetching servers for Ep:", epId);
+    const res = await fetch(`/api/anime?path=anime/get-server-list`, {
+      method: 'POST',
+      body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
+    });
+    const json = await res.json();
+    console.log("Server List Response:", json);
+    
+    // PERBAIKAN: API Paman mengirim objek yang isinya ada properti 'list'
+    // Lihat di gambar console: { list: Array(3), serverurl: "...", quality: "SD" }
+    const srvList = json.list || []; 
+    setServers(srvList);
+    
+    if (srvList.length > 0) {
+      // Kita pilih server pertama secara otomatis
+      const defaultServer = srvList[0];
+      setSelectedServer(defaultServer.id);
+      setVideoUrl(defaultServer.url);
+      setIsHls(defaultServer.url.includes('.m3u8'));
     }
-  };
+  } catch (err) {
+    console.error("Gagal Load Servers:", err);
+  }
+};
 
   useEffect(() => {
     const url = videoUrl;
