@@ -7,20 +7,20 @@ export default function DetailAnime() {
   const router = useRouter();
   const { id } = router.query;
   
-  // --- STATE MANAGEMENT (PASTIKAN SEMUA ADA) ---
+
   const [anime, setAnime] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [servers, setServers] = useState([]);
   const [selectedEp, setSelectedEp] = useState(null);
-  const [selectedServer, setSelectedServer] = useState(null); // INI YANG TADI KURANG
+  const [selectedServer, setSelectedServer] = useState(null); 
   const [videoUrl, setVideoUrl] = useState('');
   const [loading, setLoading] = useState(true);
   const [isHls, setIsHls] = useState(false);
   
   const videoRef = useRef(null);
-  const hlsRef = useRef(null); // Simpan instance HLS biar bisa di-destroy dengan bersih
+  const hlsRef = useRef(null); 
 
-  // 1. Ambil Detail Anime & Episode
+
   useEffect(() => {
     if (!id) return;
 
@@ -33,14 +33,13 @@ export default function DetailAnime() {
         });
         const json = await res.json();
 
-        // Sesuai log Paman: Datanya langsung di root object (bukan json.data)
+      
         if (json && json.id) {
           setAnime(json);
           const epList = json.episodes || [];
           setEpisodes(epList);
 
           if (epList.length > 0) {
-            // Putar episode pertama secara otomatis
             fetchServers(epList[0].id);
           }
         }
@@ -54,7 +53,6 @@ export default function DetailAnime() {
     initData();
   }, [id]);
 
-  // 2. Ambil List Server (Berdasarkan Klik Episode)
 const fetchServers = async (epId) => {
   setSelectedEp(epId);
   try {
@@ -66,13 +64,10 @@ const fetchServers = async (epId) => {
     const json = await res.json();
     console.log("Server List Response:", json);
     
-    // PERBAIKAN: API Paman mengirim objek yang isinya ada properti 'list'
-    // Lihat di gambar console: { list: Array(3), serverurl: "...", quality: "SD" }
     const srvList = json.list || []; 
     setServers(srvList);
     
     if (srvList.length > 0) {
-      // Kita pilih server pertama secara otomatis
       const defaultServer = srvList[0];
       setSelectedServer(defaultServer.id);
       setVideoUrl(defaultServer.url);
@@ -83,12 +78,11 @@ const fetchServers = async (epId) => {
   }
 };
 
-  // 3. Set URL Video & Cek tipe (M3U8 atau Embed)
+
   const handleServerSelection = (srv) => {
     setSelectedServer(srv.id);
     setVideoUrl(srv.url);
     
-    // Cek apakah link m3u8 (HLS)
     if (srv.url?.includes('.m3u8')) {
       setIsHls(true);
     } else {
@@ -96,10 +90,9 @@ const fetchServers = async (epId) => {
     }
   };
 
-  // 4. Player Logic (HLS.js)
   useEffect(() => {
     if (isHls && videoUrl && videoRef.current) {
-      // Hapus player lama kalau ada (biar gak numpuk)
+  
       if (hlsRef.current) {
         hlsRef.current.destroy();
       }
