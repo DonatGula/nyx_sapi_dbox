@@ -119,21 +119,12 @@ const fetchServers = async (epId) => {
       <Head><title>{anime.title}</title></Head>
 
       {/* PLAYER SECTION */}
-      <div className="w-full aspect-video bg-black shadow-2xl relative overflow-hidden group">
+      <div className="w-full aspect-video bg-black shadow-2xl relative border-b border-white/5">
         {videoUrl ? (
           isHls ? (
             <video ref={videoRef} controls className="w-full h-full" poster={anime.image_cover} autoPlay />
           ) : (
-            /* JIKA DARI BLOGGER / BLOGSPOT */
-            <iframe 
-              src={videoUrl} 
-              className="absolute top-0 left-0 w-full h-full border-0" 
-              allowFullScreen={true}
-              /* Penting: Sandbox agar tidak ada iklan pop-up dari pihak ketiga */
-              sandbox="allow-scripts allow-same-origin allow-forms"
-              /* Memaksa aspect ratio tetap terjaga */
-              style={{ objectFit: 'cover' }}
-            />
+            <iframe src={videoUrl} className="w-full h-full border-0" allowFullScreen />
           )
         ) : (
           <div className="w-full h-full flex items-center justify-center text-[10px] uppercase tracking-widest text-gray-600">
