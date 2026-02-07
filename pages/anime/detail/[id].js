@@ -70,6 +70,7 @@ export default function DetailAnime() {
       if (srvList.length > 0) {
         setVideoUrl(srvList[0].url);
       }
+
     } catch (err) {
       console.error("Gagal Load Servers:", err);
     }
@@ -87,12 +88,14 @@ export default function DetailAnime() {
     }
   }, [videoUrl]);
 
-  if (loading) return (
-    <div className="bg-black min-h-screen flex flex-col items-center justify-center text-red-600 font-black italic">
-      <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p className="tracking-[0.5em] animate-pulse">SYNCHRONIZING...</p>
-    </div>
-  );
+ // Gunakan pengecekan yang lebih spesifik
+    if (loading) {
+      return <div className="loading...">Sabar Paman, lagi sinkronisasi...</div>;
+    }
+
+    if (!anime || !anime.title) {
+      return <div className="error...">Data anime gagal diproses.</div>;
+    }
 
   return (
     <div className="bg-[#050507] min-h-screen text-white pb-20 font-sans">
