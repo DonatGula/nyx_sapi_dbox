@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
+
 export default function AnimeHome() {
   const [recommend, setRecommend] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,7 @@ export default function AnimeHome() {
     <div className="bg-[#050507] min-h-screen text-white font-sans selection:bg-red-600">
       <Head>
         <title>N-Studio | Anime Streaming</title>
-       <script src="https://cdn.tailwindcss.com"></script>
+        <link href="/src/style.css" rel="stylesheet"></link>
       </Head>
 
       {/* NAVBAR */}
