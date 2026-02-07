@@ -27,18 +27,19 @@ export default function DetailAnime() {
           method: 'POST',
           body: JSON.stringify({ id: id })
         });
+     // Ganti bagian ini di dalam useEffect Paman:
         const json = await res.json();
         console.log("Detail API Response:", json);
 
-        if (json.data) {
-          setAnime(json.data);
-          const epList = json.data.episodes || [];
+        // PERBAIKAN: Langsung set json sebagai anime, karena datanya ada di root object
+        if (json && json.id) { 
+          setAnime(json); // Jangan pakai json.data karena di log Paman datanya langsung di json
+          const epList = json.episodes || [];
           setEpisodes(epList);
 
-          // Ambil episode pertama dari list (biasanya index terakhir atau index 0)
           if (epList.length > 0) {
+            // Biasanya episode 1 ada di urutan terakhir atau pertama, sesuaikan:
             const firstEp = epList[0]; 
-            console.log("Loading Episode 1:", firstEp.id);
             fetchServers(firstEp.id);
           }
         }
