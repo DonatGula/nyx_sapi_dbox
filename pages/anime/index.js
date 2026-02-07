@@ -29,7 +29,7 @@ export default function AnimeHome() {
     <div className="bg-[#050507] min-h-screen text-white font-sans selection:bg-red-600">
       <Head>
         <title>N-Studio | Anime Streaming</title>
-        {/* HAPUS SCRIPT CDN TAILWIND DI SINI, SUDAH OTOMATIS DARI NEXT.JS */}
+       <script src="https://cdn.tailwindcss.com"></script>
       </Head>
 
       {/* NAVBAR */}
