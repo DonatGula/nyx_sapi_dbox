@@ -136,6 +136,11 @@ export default function Home() {
             <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-purple-500 rounded-lg flex items-center justify-center font-black text-xs">Nat</div>
             <h1 className="text-xl font-black tracking-tighter uppercase italic">Studioo</h1>
           </div>
+          <div className="flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+             <Link href="/komik" className="hover:text-yellow-500 transition">Manga</Link>
+             <Link href="/anime" className="text-white border-b-2 border-red-600">anime</Link>
+             <Link href="/" className="hover:text-red-500 transition hidden sm:block">Home</Link>
+          </div>
           <div className="relative w-full max-w-md">
             <input 
               type="text" 
@@ -144,11 +149,7 @@ export default function Home() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
-             <Link href="/komik" className="hover:text-yellow-500 transition">Manga</Link>
-             <Link href="/anime" className="text-white border-b-2 border-red-600">anime</Link>
-             <Link href="/" className="hover:text-red-500 transition hidden sm:block">Home</Link>
-          </div>
+          
         </div>
       </nav>
 
