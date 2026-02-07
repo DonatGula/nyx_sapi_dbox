@@ -1,14 +1,11 @@
 export default async function handler(req, res) {
   const { path } = req.query;
 
-  // 1. Pastikan Path ada
   if (!path) {
     return res.status(400).json({ error: 'Path API tidak ditemukan' });
   }
 
   try {
-    // 2. Siapkan Body
-    // Kita harus handle kalau body datang dalam bentuk string atau objek
     let bodyData = "";
     if (req.body) {
       const parsedBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
