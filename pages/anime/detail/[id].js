@@ -39,7 +39,7 @@ export default function DetailAnime() {
         // 2. Ambil Server List
         const resServers = await fetch(`/api/anime?path=anime/get-server-list`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' , 'x-api-key': 'ThWmZq4t7w!z%C*F-JaNdRgUkXn2r5u8',},
           body: new URLSearchParams({ 
             id: '164785', // Paman, pastikan ID episode ini dinamis nanti ya!
             animeID: id, 
