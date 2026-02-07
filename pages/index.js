@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import CryptoJS from 'crypto-js';
+import Hls from 'hls.js';
 
 const SECRET_KEY = "nyxdrama2026"; 
 
@@ -42,6 +43,8 @@ export default function Home() {
   const [touchEnd, setTouchEnd] = useState(null);
   const minSwipeDistance = 50;
 
+  const videoRef = useRef(null);
+
   useEffect(() => {
     fetch('/api/drama')
       .then(res => res.json())
@@ -52,6 +55,21 @@ export default function Home() {
       })
       .catch(err => console.error("Access Denied"));
   }, []);
+
+  useEffect(() => {
+    if (activeEpisode && videoRef.current) {
+      const video = videoRef.current;
+      const videoSrc = activeEpisode.video_url;
+
+      if (Hls.isSupported() && videoSrc.includes('.m3u8')) {
+        const hls = new Hls();
+        hls.loadSource(videoSrc);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = videoSrc;
+      }
+    }
+  }, [activeEpisode]);
 
   const openDetail = async (id) => {
     setLoadingDetail(true);
@@ -158,17 +176,17 @@ export default function Home() {
             >
               <div className="relative w-full h-full flex items-center justify-center">
                 {activeEpisode ? (
-                  <video 
-                    key={activeEpisode.video_url} 
-                    controls autoPlay onEnded={handleNext} 
-                    referrerPolicy="no-referrer" 
+                  <video
+                    ref={videoRef}
+                    key={activeEpisode.video_url}
+                    controls autoPlay onEnded={handleNext}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-contain pointer-events-auto"
                   >
-                    <source src={activeEpisode.video_url} type="video/mp4" />
                     {activeEpisode?.subtitle_url && (
-                      <track 
+                      <track
                         src={`/api/sub?url=${encodeURIComponent(activeEpisode.subtitle_url)}`}
-                        kind="subtitles" srcLang="id" label="Indonesia" default 
+                        kind="subtitles" srcLang="id" label="Indonesia" default
                       />
                     )}
                   </video>
