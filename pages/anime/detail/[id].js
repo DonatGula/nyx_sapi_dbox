@@ -61,6 +61,13 @@ export default function DetailAnime() {
     try {
       const res = await fetch(`/api/anime?path=anime/get-server-list`, {
         method: 'POST',
+        headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'x-api-key': 'ThWmZq4t7w!z%C*F-JaNdRgUkXn2r5u8', 
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36',
+        'Referer': 'https://uservideo.xyz/', // Pura-pura datang dari web mereka sendiri
+        'Origin': 'https://uservideo.xyz/',
+      },
         body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
       });
       const json = await res.json();
