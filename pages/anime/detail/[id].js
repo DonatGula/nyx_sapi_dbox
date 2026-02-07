@@ -56,34 +56,39 @@ export default function DetailAnime() {
 
   // 2. Ambil List Server (Berdasarkan Klik Episode)
   const fetchServers = async (epId) => {
-    setSelectedEp(epId);
-    setVideoUrl(''); // Reset video biar ada efek loading antar episode
-    try {
-      const res = await fetch(`/api/anime?path=anime/get-server-list`, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'x-api-key': 'ThWmZq4t7w!z%C*F-JaNdRgUkXn2r5u8', 
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Mobile Safari/537.36',
-        'Referer': 'https://uservideo.xyz/', // Pura-pura datang dari web mereka sendiri
-        'Origin': 'https://uservideo.xyz/',
-      },
-        body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
-      });
-      const json = await res.json();
+  setSelectedEp(epId);
+  setLoading(true); // Kasih loading sebentar pas ganti episode
+  
+  try {
+    const res = await fetch(`/api/anime?path=anime/get-server-list`, {
+      method: 'POST',
+      body: JSON.stringify({ id: epId, animeID: id, jenisAnime: '1' })
+    });
+    const json = await res.json();
+    const srvList = json.list || [];
+    setServers(srvList);
+
+    if (srvList.length > 0) {
+      // --- LOGIKA AUTO-SELECT MULAI DI SINI ---
       
-      // Sesuai log Paman: Daftar server ada di properti 'list'
-      const srvList = json.list || [];
-      setServers(srvList);
+      // 1. Cari yang tipenya HLS (.m3u8) duluan karena paling stabil & tanpa blokir iframe
+      const bestServer = srvList.find(s => s.url.includes('.m3u8')) 
+                      || srvList.find(s => s.quality === 'HD') // 2. Kalau gak ada, cari yang HD
+                      || srvList[0]; // 3. Kalau gak ada juga, ambil yang paling pertama
+
+      console.log("Auto-selecting best server:", bestServer.server);
+      handleServerSelection(bestServer);
       
-      if (srvList.length > 0) {
-        // Pilih server pertama otomatis
-        handleServerSelection(srvList[0]);
-      }
-    } catch (err) {
-      console.error("Gagal Load Servers:", err);
+    } else {
+      setError("Duh, episode ini belum ada servernya Paman.");
     }
-  };
+  } catch (err) {
+    console.error("Gagal ambil server:", err);
+    setError("Koneksi server lagi bermasalah.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // 3. Set URL Video & Cek tipe (M3U8 atau Embed)
   const handleServerSelection = (srv) => {
