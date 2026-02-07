@@ -139,7 +139,7 @@ export default function Home() {
           <div className="flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
              <Link href="/komik" className="hover:text-yellow-500 transition">Manga</Link>
              <Link href="/anime" className="text-white border-b-2 border-red-600">anime</Link>
-             <Link href="" className="hover:text-red-500 transition hidden sm:block">Home</Link>
+             <Link href="#" className="hover:text-red-500 transition hidden sm:block">Home</Link>
           </div>
           <div className="relative w-full max-w-md">
             <input 
