@@ -143,6 +143,7 @@ export default function Home() {
               className="w-full bg-white/5 border border-white/10 p-2 pl-10 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/50 text-sm"
               onChange={(e) => setSearch(e.target.value)}
             />
+            </div>
         </div>
       </nav>
 
