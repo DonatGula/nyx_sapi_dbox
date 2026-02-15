@@ -8,7 +8,7 @@ const TABS = [
   { id: 'indonesian-movies', label: 'Indonesia' },
   { id: 'kdrama', label: 'K-Drama' },
   { id: 'anime', label: 'Anime' },
-  { id: 'short-tv', label: 'Short TV' },
+  { id: 'short-tv', label: 'Dracin' },
   { id: 'adult-comedy', label: 'Candaan Dewasa' },
   { id: 'western-tv', label: 'Western TV' },
   { id: 'indo-dub', label: 'Indo Dub' },
@@ -20,15 +20,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isDark, setIsDark] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // State halaman
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // loadData sekarang menerima parameter pageNum
   const loadData = useCallback(async (action, pageNum = 1, query = '') => {
     setLoading(true);
     if (!query) setItems([]); 
 
     try {
-      // Menggabungkan parameter action, page, dan search query
       const url = `/api/movies?action=${action}&page=${pageNum}${query ? `&q=${encodeURIComponent(query)}` : ''}`;
       const res = await fetch(url);
       const data = await res.json();
@@ -41,7 +39,6 @@ export default function Home() {
     }
   }, []);
 
-  // Reset ke halaman 1 setiap kali ganti tab
   useEffect(() => {
     if (!search) {
       setCurrentPage(1);
@@ -60,16 +57,28 @@ export default function Home() {
   return (
     <div className={`min-h-screen transition-colors duration-500 selection:bg-[#FF2D85] selection:text-white pb-20 ${isDark ? 'bg-[#050507] text-white/80' : 'bg-[#FDF2F8] text-slate-800'}`}>
       <Head>
-        <title>N-STREAM | Movie & Series</title>
+        <title>Nonton-Yuk | Movie & Series</title>
       </Head>
 
       {/* STICKY NAVBAR */}
       <nav className="fixed top-0 w-full z-50 backdrop-blur-sm">
         <div className={`mx-auto flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg border p-4 px-8 transition-all ${isDark ? 'bg-[#111114]/80 backdrop-blur-xl border-white/5' : 'bg-white/80 backdrop-blur-xl border-pink-100'}`}>
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-[#FF2D85] text-white px-3 py-1 rounded-xl font-black italic shadow-[3px_3px_0px_#000]">N</div>
-            <h1 className={`text-2xl font-black italic tracking-tighter transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>STREAM</h1>
-          </Link>
+          <Link href="/" className="flex items-center gap-3 group">
+  <div className={`p-2 rounded-xl transition-all duration-500 ${isDark ? 'bg-white/5' : 'bg-slate-900'}`}>
+    <img 
+      src="/logo/logo.webp" 
+      alt="Nonton-Yuk Logo" 
+      className={`h-9 w-auto object-contain transition-transform group-hover:scale-110 
+        ${isDark 
+          ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' 
+          : 'drop-shadow-[2px_2px_0px_#FF2D85] filter invert-[0.1]' // Shadow pink kaku ala retro
+        }`} 
+    />
+  </div>
+  <h1 className={`text-xl font-black italic tracking-tighter transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
+    NONTON<span className="text-[#FF2D85]">-</span>YUK
+  </h1>
+</Link>
             
           <div className="flex items-center gap-4 w-full md:w-auto">
              <button className={`p-2.5 rounded-2xl transition-all border-2 font-black text-[10px] uppercase ${isDark ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'bg-white border-pink-100 text-slate-400'}`}>
