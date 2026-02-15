@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Tambahan custom CSS Paman tetap di bawahnya */
+@layer base {
+  body {
+    @apply bg-[#050507] text-white selection:bg-red-600;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
