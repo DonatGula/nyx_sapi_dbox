@@ -64,21 +64,21 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 backdrop-blur-sm">
         <div className={`mx-auto flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg border p-4 px-8 transition-all ${isDark ? 'bg-[#111114]/80 backdrop-blur-xl border-white/5' : 'bg-white/80 backdrop-blur-xl border-pink-100'}`}>
           <Link href="/" className="flex items-center gap-3 group">
-  <div className={`p-2 rounded-xl transition-all duration-500 ${isDark ? 'bg-white/5' : 'bg-slate-900'}`}>
-    <img 
-      src="/logo/logo.webp" 
-      alt="Nonton-Yuk Logo" 
-      className={`h-9 w-auto object-contain transition-transform group-hover:scale-110 
-        ${isDark 
-          ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' 
-          : 'drop-shadow-[2px_2px_0px_#FF2D85] filter invert-[0.1]' // Shadow pink kaku ala retro
-        }`} 
-    />
-  </div>
-  <h1 className={`text-xl font-black italic tracking-tighter transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
-    NONTON<span className="text-[#FF2D85]">-</span>YUK
-  </h1>
-</Link>
+          <div className={`p-2 rounded-xl transition-all duration-500 ${isDark ? 'bg-white/5' : 'bg-slate-900'}`}>
+            <img 
+              src="/logo/logo.webp" 
+              alt="Nonton-Yuk Logo" 
+              className={`h-9 w-auto object-contain transition-transform group-hover:scale-110 
+                ${isDark 
+                  ? 'drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]' 
+                  : 'drop-shadow-[2px_2px_0px_#FF2D85] filter invert-[0.1]' // Shadow pink kaku ala retro
+                }`} 
+            />
+          </div>
+            <h1 className={`text-xl font-black italic tracking-tighter transition-colors ${isDark ? 'text-white' : 'text-slate-900'}`}>
+              NONTON<span className="text-[#FF2D85]">-</span>YUK
+            </h1>
+          </Link>
             
           <div className="flex items-center gap-4 w-full md:w-auto">
              <button className={`p-2.5 rounded-2xl transition-all border-2 font-black text-[10px] uppercase ${isDark ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'bg-white border-pink-100 text-slate-400'}`}>

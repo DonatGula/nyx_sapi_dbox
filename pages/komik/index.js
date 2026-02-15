@@ -83,7 +83,7 @@ export default function KomikHome() {
             )}
             </div>
             <div className="flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
-             <Link href="/" className="hover:text-red-500 transition hidden sm:block">Home</Link>
+             <Link href="/" className="hover:text-red-500 transition hidden sm:block">NONTON-YUK</Link>
           </div>
         </div>
       </nav>
