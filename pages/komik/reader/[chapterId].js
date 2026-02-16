@@ -11,7 +11,7 @@ export default function ReaderKomik() {
 
   // State untuk Auto Scroll
   const [isScrolling, setIsScrolling] = useState(false);
-  const [scrollSpeed, setScrollSpeed] = useState(2); // Kecepatan default
+  const [scrollSpeed, setScrollSpeed] = useState(2);
 
   // 1. Fetch Data Chapter
   useEffect(() => {
@@ -32,24 +32,33 @@ export default function ReaderKomik() {
 
     fetchChapter();
     window.scrollTo(0, 0);
-    setIsScrolling(false); // Reset auto scroll saat ganti chapter
+    setIsScrolling(false);
   }, [chapterId]);
 
-  // 2. Simpan Riwayat Otomatis saat Chapter Berhasil Dimuat
+  // 2. SIMPAN RIWAYAT (DIPERBAIKI AGAR SINKRON DENGAN HOME)
   useEffect(() => {
     if (chapter) {
       const history = JSON.parse(localStorage.getItem('nonton_yuk_history') || '[]');
+      
+      // Ambil Title & Cover dari response API chapter
+      // Note: Pastikan key ini sesuai dengan response API paman
+      const currentMangaTitle = chapter.manga_title || chapter.manga?.title || "Manga";
+      const currentMangaCover = chapter.manga_cover_image_url || chapter.manga?.cover_image_url || "";
+
+      const newEntry = { 
+        mangaId: chapter.manga_id, 
+        chapterId: chapter.chapter_id, 
+        chapterNum: chapter.chapter_number,
+        mangaTitle: currentMangaTitle, // Sesuai dengan Home
+        mangaCover: currentMangaCover, // Sesuai dengan Home
+        date: new Date() 
+      };
+
       const newHistory = [
-        { 
-          mangaId: chapter.manga_id, 
-          chapterId: chapter.chapter_id, 
-          chapterNum: chapter.chapter_number,
-          mangaTitle: chapter.manga_title || "Manga",
-          mangaCover: chapter.manga_cover || "",
-          date: new Date() 
-        },
+        newEntry,
         ...history.filter(item => item.mangaId !== chapter.manga_id)
       ].slice(0, 20);
+
       localStorage.setItem('nonton_yuk_history', JSON.stringify(newHistory));
     }
   }, [chapter]);
@@ -63,7 +72,7 @@ export default function ReaderKomik() {
           top: scrollSpeed,
           behavior: 'auto'
         });
-      }, 30); // Interval 30ms agar gerakan smooth
+      }, 30);
     } else {
       clearInterval(scrollInterval);
     }
@@ -83,7 +92,7 @@ export default function ReaderKomik() {
         <meta name="referrer" content="no-referrer" />
       </Head>
 
-      {/* FIXED TOP NAV */}
+      {/* NAV TOP */}
       <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/5 p-4 flex justify-between items-center">
         <button onClick={() => router.back()} className="text-[10px] font-black flex items-center gap-2 hover:text-yellow-500 transition-colors uppercase italic">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -91,14 +100,16 @@ export default function ReaderKomik() {
         </button>
         
         <div className="text-center">
-            <h1 className="text-[10px] font-black text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[120px] md:max-w-xs">{chapter?.manga_title}</h1>
+            <h1 className="text-[10px] font-black text-gray-500 uppercase tracking-widest line-clamp-1 max-w-[120px] md:max-w-xs">
+              {chapter?.manga_title || "Reading"}
+            </h1>
             <p className="text-xs font-black italic text-yellow-500">CHAPTER {chapter?.chapter_number}</p>
         </div>
 
         <div className="flex items-center gap-3">
           {chapter?.next_chapter_id && (
             <Link href={`/komik/reader/${chapter.next_chapter_id}`}>
-              <button className="px-4 md:px-6 py-2 bg-yellow-500 text-black rounded-lg text-[10px] font-black uppercase hover:scale-105 transition-transform shadow-[0_0_15px_#ea7e08]/30">
+              <button className="px-4 md:px-6 py-2 bg-yellow-500 text-black rounded-lg text-[10px] font-black uppercase hover:scale-105 transition-transform">
                 Next →
               </button>
             </Link>
@@ -106,10 +117,10 @@ export default function ReaderKomik() {
         </div>
       </nav>
 
-      {/* FLOATING AUTO SCROLL CONTROLLER */}
+      {/* FLOATING AUTO SCROLL */}
       <div className="fixed bottom-10 right-6 z-[60] flex flex-col gap-3">
         {isScrolling && (
-            <div className="flex flex-col items-center gap-2 bg-black/80 border border-white/10 p-2 rounded-2xl backdrop-blur-lg animate-in slide-in-from-right-5">
+            <div className="flex flex-col items-center gap-2 bg-black/80 border border-white/10 p-2 rounded-2xl backdrop-blur-lg">
                 <button onClick={() => setScrollSpeed(prev => Math.min(prev + 1, 6))} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg">+</button>
                 <span className="text-[10px] font-black text-yellow-500 italic">{scrollSpeed}</span>
                 <button onClick={() => setScrollSpeed(prev => Math.max(prev - 1, 1))} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg">-</button>
@@ -128,7 +139,7 @@ export default function ReaderKomik() {
         </button>
       </div>
 
-      {/* IMAGE RENDERER */}
+      {/* IMAGES */}
       <main className="pt-20 flex flex-col items-center bg-black">
         <div className="w-full max-w-3xl">
           {chapter?.chapter?.data?.map((fileName, idx) => {
@@ -140,14 +151,13 @@ export default function ReaderKomik() {
                 alt={`Page ${idx}`} 
                 className="w-full h-auto block select-none pointer-events-none"
                 loading="lazy"
-                onError={(e) => { e.target.style.display = 'none'; }}
               />
             );
           })}
         </div>
       </main>
 
-      {/* BOTTOM NAVIGATION */}
+      {/* FOOTER NAV */}
       <footer className="bg-[#0a0a0d] py-20 flex flex-col items-center gap-10 border-t border-white/5 px-6">
         <div className="flex flex-wrap justify-center gap-4">
           {chapter?.prev_chapter_id && (
@@ -172,21 +182,10 @@ export default function ReaderKomik() {
             </Link>
           )}
         </div>
-        
-        <button 
-          onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-          className="group flex flex-col items-center gap-2 opacity-50 hover:opacity-100 transition-opacity"
-        >
-          <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:border-yellow-500 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-          <span className="text-[9px] font-black uppercase tracking-[0.3em]">Ke Atas</span>
-        </button>
       </footer>
 
       <style jsx global>{`
         body { background-color: black; overflow-x: hidden; }
-        /* Hilangkan scrollbar agar auto scroll terasa lebih imersif */
         ::-webkit-scrollbar { width: 0px; }
       `}</style>
     </div>
