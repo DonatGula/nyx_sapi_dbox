@@ -96,9 +96,9 @@ export default function KomikHome() {
             <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
               {history.map((item, idx) => (
                 <Link key={idx} href={`/komik/${item.mangaId}`} className="shrink-0 w-64 bg-[#16161e] border border-white/5 rounded-2xl overflow-hidden hover:border-yellow-500/50 transition-all flex h-24">
-                  <img src={item.mangaCover} className="w-16 h-full object-cover" alt="" />
+                  <img src={manga.cover} className="w-16 h-full object-cover" alt="" />
                   <div className="p-3 flex flex-col justify-center min-w-0">
-                    <h4 className="text-[11px] font-black uppercase italic truncate mb-1">{item.mangaTitle}</h4>
+                    <h4 className="text-[11px] font-black uppercase italic truncate mb-1">{manga.title}</h4>
                     <span className="bg-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded w-fit">CH {item.chapterNum}</span>
                   </div>
                 </Link>
