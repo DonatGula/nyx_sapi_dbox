@@ -9,26 +9,74 @@ export default function DetailKomik() {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // State untuk Pagination dan Filter
+  // State Pagination & Filter
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(50); // Kita load 50 chapter per halaman biar gak berat
-  const [sortOrder, setSortOrder] = useState('desc'); // 'desc' terbaru, 'asc' terlama
+  const [pageSize] = useState(50);
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [searchChapter, setSearchChapter] = useState('');
 
-  const fetchChapters = useCallback(async (page, order) => {
+  // State Bookmark
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  // 1. Cek Status Bookmark saat Load
+  useEffect(() => {
+    if (!id) return;
+    const bookmarks = JSON.parse(localStorage.getItem('nonton_yuk_bookmarks') || '[]');
+    setIsBookmarked(bookmarks.some(item => item.id === id));
+  }, [id]);
+
+  // 2. Fungsi Toggle Bookmark
+  const toggleBookmark = () => {
+    if (!manga) return;
+    const bookmarks = JSON.parse(localStorage.getItem('nonton_yuk_bookmarks') || '[]');
+    let newBookmarks;
+    
+    if (isBookmarked) {
+      newBookmarks = bookmarks.filter(item => item.id !== id);
+    } else {
+      newBookmarks = [{ 
+        id, 
+        title: manga.title, 
+        cover: manga.cover_image_url,
+        type: manga?.taxonomy?.Format?.[0]?.name || 'Manhwa'
+      }, ...bookmarks];
+    }
+    
+    localStorage.setItem('nonton_yuk_bookmarks', JSON.stringify(newBookmarks));
+    setIsBookmarked(!isBookmarked);
+  };
+
+  // 3. Fungsi Simpan Riwayat Baca (Trigger saat klik chapter)
+  const handleChapterClick = (ch) => {
+    if (!manga) return;
+    const history = JSON.parse(localStorage.getItem('nonton_yuk_history') || '[]');
+    const newHistory = [
+      { 
+        mangaId: id, 
+        chapterId: ch.chapter_id, 
+        chapterNum: ch.chapter_number,
+        mangaTitle: manga.title,
+        mangaCover: manga.cover_image_url,
+        date: new Date() 
+      },
+      ...history.filter(item => item.mangaId !== id)
+    ].slice(0, 20);
+
+    localStorage.setItem('nonton_yuk_history', JSON.stringify(newHistory));
+    router.push(`/komik/reader/${ch.chapter_id}`);
+  };
+
+  // 4. Load Data Chapters (Mendukung Search & Sort)
+  const fetchChapters = useCallback(async (page, order, query = '') => {
     if (!id) return;
     try {
       setLoading(true);
-      // URL API disesuaikan dengan parameter page dan sort
-      const resChapters = await fetch(
-        `https://api.shngm.io/v1/chapter/${id}/list?page=${page}&page_size=${pageSize}&sort_by=chapter_number&sort_order=${order}`
-      );
+      let url = `https://api.shngm.io/v1/chapter/${id}/list?page=${page}&page_size=${pageSize}&sort_by=chapter_number&sort_order=${order}`;
+      if (query) url += `&q=${encodeURIComponent(query)}`;
+      
+      const resChapters = await fetch(url);
       const dataChapters = await resChapters.json();
       setChapters(dataChapters.data || []);
-      
-      // Scroll halus ke list chapter setelah ganti page
-      if (page > 1) {
-        document.getElementById('chapter-list')?.scrollIntoView({ behavior: 'smooth' });
-      }
     } catch (err) {
       console.error("Gagal memuat chapter", err);
     } finally {
@@ -36,6 +84,7 @@ export default function DetailKomik() {
     }
   }, [id, pageSize]);
 
+  // Initial Load
   useEffect(() => {
     if (!id) return;
     const fetchMangaDetail = async () => {
@@ -43,26 +92,33 @@ export default function DetailKomik() {
         const resDetail = await fetch(`https://api.shngm.io/v1/manga/detail/${id}`);
         const dataDetail = await resDetail.json();
         setManga(dataDetail.data);
-      } catch (err) {
-        console.error("Gagal memuat detail", err);
-      }
+      } catch (err) { console.error(err); }
     };
 
     fetchMangaDetail();
     fetchChapters(1, 'desc');
   }, [id, fetchChapters]);
 
-  // Fungsi navigasi page
+  // Logic Pencarian Chapter (Debounce)
+  useEffect(() => {
+    if (searchChapter === undefined) return;
+    const timer = setTimeout(() => {
+      if (id) fetchChapters(1, sortOrder, searchChapter);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchChapter, id, sortOrder, fetchChapters]);
+
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    fetchChapters(newPage, sortOrder);
+    fetchChapters(newPage, sortOrder, searchChapter);
+    document.getElementById('chapter-list')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const toggleSort = () => {
     const newOrder = sortOrder === 'desc' ? 'asc' : 'desc';
     setSortOrder(newOrder);
-    setCurrentPage(1); // Balik ke page 1 kalau ganti urutan
-    fetchChapters(1, newOrder);
+    setCurrentPage(1);
+    fetchChapters(1, newOrder, searchChapter);
   };
 
   if (loading && !manga) return (
@@ -78,45 +134,54 @@ export default function DetailKomik() {
         <meta name="referrer" content="no-referrer" />
       </Head>
 
-      {/* NAV & HERO SECTION (Tetap sama seperti kode paman sebelumnya) */}
+      {/* NAV */}
       <nav className="fixed top-0 w-full z-[70] bg-[#0a0a0d]/80 backdrop-blur-lg border-b border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <button onClick={() => router.back()} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
-          <span className="text-[10px] font-black tracking-[0.3em] uppercase opacity-50 truncate max-w-[200px]">{manga?.title}</span>
-          <div className="w-10"></div>
+          
+          <button 
+            onClick={toggleBookmark}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              isBookmarked ? 'bg-yellow-500 text-black shadow-[0_0_20px_rgba(234,126,8,0.4)]' : 'bg-white/5 text-white border border-white/10'
+            }`}
+          >
+            {isBookmarked ? '🔖 Terpasang' : '📑 Bookmark'}
+          </button>
         </div>
       </nav>
 
-      {/* Hero Content (manga detail) */}
+      {/* HERO SECTION */}
       <div className="relative pt-20 overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-[400px] pointer-events-none">
+        <div className="absolute top-0 inset-x-0 h-[500px] pointer-events-none">
           <img src={manga?.cover_image_url} className="w-full h-full object-cover opacity-20 blur-3xl scale-150" alt="" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0d] via-transparent to-transparent"></div>
         </div>
+        
         <div className="relative max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row gap-8 lg:gap-12">
             <div className="w-full md:w-64 flex-shrink-0 group">
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                    <img src={manga?.cover_image_url} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt={manga?.title} />
+                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl">
+                    <img src={manga?.cover_image_url} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt={manga?.title} />
                 </div>
             </div>
-            <div className="flex-1 space-y-6">
-                <div className="space-y-2">
+            <div className="flex-1 space-y-6 pt-4">
+                <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
-                        <span className="bg-yellow-500 text-black px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter">
+                        <span className="bg-yellow-500 text-black px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
                             {manga?.taxonomy?.Format?.[0]?.name || 'Manhwa'}
                         </span>
-                        <span className="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-gray-400">
+                        <span className="bg-white/10 px-3 py-1 rounded-lg text-[10px] font-bold text-gray-300 uppercase tracking-widest">
                             {manga?.release_year} • {manga?.status === 1 ? 'ONGOING' : 'COMPLETED'}
                         </span>
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">{manga?.title}</h1>
-                    <p className="text-yellow-500 font-bold text-sm tracking-wide italic">{manga?.taxonomy?.Author?.[0]?.name}</p>
+                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">{manga?.title}</h1>
+                    <p className="text-yellow-500 font-bold text-lg tracking-wide italic opacity-80">{manga?.taxonomy?.Author?.[0]?.name}</p>
                 </div>
-                <div className="max-w-2xl">
-                    <h3 className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-2 italic">Synopsis</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">
+                
+                <div className="max-w-2xl bg-white/5 p-6 rounded-3xl border border-white/5 backdrop-blur-sm">
+                    <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-3 italic">Synopsis</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-500 cursor-pointer">
                         {manga?.description || 'No description available.'}
                     </p>
                 </div>
@@ -124,81 +189,98 @@ export default function DetailKomik() {
         </div>
       </div>
 
-      {/* CHAPTER SECTION DENGAN PAGINATION */}
-      <div id="chapter-list" className="max-w-6xl mx-auto px-6 mt-10">
-        <div className="bg-[#16161e]/40 border border-white/5 rounded-3xl p-6 md:p-8">
+      {/* CHAPTER SECTION */}
+      <div id="chapter-list" className="max-w-6xl mx-auto px-6 mt-12">
+        <div className="bg-[#16161e]/40 border border-white/5 rounded-[2.5rem] p-6 md:p-10 backdrop-blur-md">
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 bg-yellow-500 rounded-full"></div>
-              <h3 className="text-xl font-black uppercase tracking-tighter">Chapters</h3>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-10">
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-8 bg-yellow-500 rounded-full shadow-[0_0_15px_#ea7e08]"></div>
+              <h3 className="text-2xl font-black uppercase tracking-tighter italic">Chapter List</h3>
             </div>
             
-            <div className="flex items-center gap-2">
-              {/* Tombol Urutan */}
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+              {/* SEARCH INPUT */}
+              <div className="relative flex-1 lg:w-48">
+                <input 
+                  type="number"
+                  placeholder="Cari Ch..."
+                  value={searchChapter}
+                  onChange={(e) => { setSearchChapter(e.target.value); setCurrentPage(1); }}
+                  className="w-full bg-[#0a0a0d] border border-white/10 rounded-2xl px-5 py-3 text-xs font-bold focus:border-yellow-500 outline-none transition-all"
+                />
+              </div>
+
+              {/* SORT BUTTON */}
               <button 
                 onClick={toggleSort}
-                className="text-[10px] font-black bg-white/5 border border-white/10 px-4 py-2 rounded-xl uppercase tracking-widest hover:bg-yellow-500 hover:text-black transition-all"
+                className="bg-white/5 border border-white/10 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-black transition-all"
               >
-                {sortOrder === 'desc' ? 'Newest ↓' : 'Oldest ↑'}
+                {sortOrder === 'desc' ? 'Terbaru ↓' : 'Terlama ↑'}
               </button>
-              <span className="text-[10px] font-bold text-gray-500 bg-white/5 px-3 py-2 rounded-xl uppercase tracking-widest">
-                Page {currentPage}
-              </span>
             </div>
           </div>
 
-          {/* List Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 relative min-h-[200px]">
-            {loading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#16161e]/50 backdrop-blur-sm z-10 rounded-2xl">
-                    <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+          {/* GRID CHAPTERS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative min-h-[300px]">
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#16161e]/60 backdrop-blur-sm z-20 rounded-3xl">
+                    <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
-            ) : null}
+            )}
 
             {chapters.length > 0 ? chapters.map((ch) => (
               <button 
                 key={ch.chapter_id}
-                onClick={() => router.push(`/komik/reader/${ch.chapter_id}`)}
-                className="flex items-center justify-between p-4 rounded-2xl bg-[#0a0a0d] border border-white/5 hover:border-yellow-500/30 hover:bg-yellow-500/[0.03] group transition-all text-left"
+                onClick={() => handleChapterClick(ch)}
+                className="flex items-center justify-between p-5 rounded-[1.5rem] bg-[#0a0a0d] border border-white/5 hover:border-yellow-500/40 hover:bg-yellow-500/[0.03] group transition-all duration-300 text-left"
               >
                 <div>
-                  <span className="text-xs font-black group-hover:text-yellow-500 transition-colors uppercase">Chapter {ch.chapter_number}</span>
-                  <p className="text-[10px] font-bold text-gray-600 uppercase mt-1">
-                    {new Date(ch.release_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  <span className="text-sm font-black group-hover:text-yellow-500 transition-colors uppercase italic">Chapter {ch.chapter_number}</span>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase mt-1 tracking-tighter">
+                    Update: {new Date(ch.release_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black transition-all">
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black group-hover:rotate-12 transition-all duration-300">
+                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 </div>
               </button>
             )) : (
-              <p className="col-span-full text-center py-10 text-gray-600 font-bold text-xs uppercase tracking-widest">No Chapters Found</p>
+              <div className="col-span-full py-24 text-center">
+                <p className="text-gray-600 font-black text-sm uppercase tracking-[0.5em] opacity-50 italic">Kosong Paman</p>
+                {searchChapter && (
+                  <button onClick={() => setSearchChapter('')} className="mt-4 text-xs text-yellow-500 font-black uppercase underline tracking-widest">Lihat Semua</button>
+                )}
+              </div>
             )}
           </div>
 
-          {/* PAGINATION BUTTONS */}
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <button 
-              disabled={currentPage === 1 || loading}
-              onClick={() => handlePageChange(currentPage - 1)}
-              className="px-6 py-3 rounded-2xl font-black text-[10px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all shadow-lg"
-            >
-              ← Prev
-            </button>
-            
-            <div className="w-12 h-12 flex items-center justify-center rounded-2xl border-2 border-yellow-500 font-black text-yellow-500 italic shadow-[4px_4px_0px_#ea7e08]">
-                {currentPage}
-            </div>
+          {/* PAGINATION (Sembunyikan jika sedang mencari) */}
+          {!searchChapter && chapters.length > 0 && (
+            <div className="mt-12 flex items-center justify-center gap-6">
+              <button 
+                disabled={currentPage === 1 || loading}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="px-8 py-4 rounded-[1.5rem] font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all shadow-xl"
+              >
+                ← Prev
+              </button>
+              
+              <div className="flex flex-col items-center">
+                <div className="w-14 h-14 flex items-center justify-center rounded-2xl border-2 border-yellow-500 font-black text-xl text-yellow-500 italic shadow-[5px_5px_0px_#ea7e08] -rotate-3">
+                    {currentPage}
+                </div>
+              </div>
 
-            <button 
-              disabled={chapters.length < pageSize || loading}
-              onClick={() => handlePageChange(currentPage + 1)}
-              className="px-6 py-3 rounded-2xl font-black text-[10px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all shadow-lg"
-            >
-              Next →
-            </button>
-          </div>
+              <button 
+                disabled={chapters.length < pageSize || loading}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="px-8 py-4 rounded-[1.5rem] font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all shadow-xl"
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
