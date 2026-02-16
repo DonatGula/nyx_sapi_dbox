@@ -6,64 +6,57 @@ export default function DetailKomik() {
   const router = useRouter();
   const { id } = router.query;
   const [manga, setManga] = useState(null);
-  const [chapters, setChapters] = useState([]);
+  const [allChapters, setAllChapters] = useState([]); // Master data
+  const [displayChapters, setDisplayChapters] = useState([]); // Data yang muncul di layar
   const [loading, setLoading] = useState(true);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(50);
   const [sortOrder, setSortOrder] = useState('desc');
   const [searchChapter, setSearchChapter] = useState('');
-
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  // 1. FUNGSI FETCH (Disederhanakan agar tidak pusing)
-  const fetchChaptersData = useCallback(async (page, order, query) => {
+  // 1. FETCH DATA UTAMA
+  const fetchInitialData = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
-      // Encode query untuk keamanan URL
-      const qParam = query ? `&q=${encodeURIComponent(query)}` : '';
-      const url = `https://api.shngm.io/v1/chapter/${id}/list?page=${page}&page_size=${pageSize}&sort_by=chapter_number&sort_order=${order}${qParam}`;
-      
-      const res = await fetch(url);
-      const result = await res.json();
-      setChapters(result.data || []);
+      // Load Detail Manga
+      const resManga = await fetch(`https://api.shngm.io/v1/manga/detail/${id}`);
+      const dataManga = await resManga.json();
+      setManga(dataManga.data);
+
+      // Load Chapters (Ambil 100 data sekaligus biar pencarian lokal enak)
+      const resCh = await fetch(`https://api.shngm.io/v1/chapter/${id}/list?page=1&page_size=100&sort_by=chapter_number&sort_order=${sortOrder}`);
+      const dataCh = await resCh.json();
+      setAllChapters(dataCh.data || []);
+      setDisplayChapters(dataCh.data || []);
     } catch (err) {
-      console.error("Gagal load chapter:", err);
+      console.error("Gagal load data paman:", err);
     } finally {
       setLoading(false);
     }
-  }, [id, pageSize]);
+  }, [id, sortOrder]);
 
-  // 2. LOGIKA PENCARIAN & LOAD AWAL (Digabung agar tidak bentrok)
   useEffect(() => {
-    if (!id) return;
+    fetchInitialData();
+  }, [fetchInitialData]);
 
-    // Jika ada input search, kita pakai debounce
+  // 2. LOGIKA PENCARIAN & FILTER (LOCAL FILTER)
+  useEffect(() => {
+    let filtered = [...allChapters];
+
+    // Filter berdasarkan nomor chapter
     if (searchChapter) {
-      const timer = setTimeout(() => {
-        setCurrentPage(1); // Reset ke hal 1 saat mencari
-        fetchChaptersData(1, sortOrder, searchChapter);
-      }, 600); // 600ms nunggu paman kelar ngetik
-      return () => clearTimeout(timer);
-    } 
-    
-    // Jika search kosong, load normal berdasarkan page saat ini
-    fetchChaptersData(currentPage, sortOrder, '');
+      filtered = filtered.filter(ch => 
+        ch.chapter_number.toString().includes(searchChapter)
+      );
+    }
 
-  }, [id, searchChapter, currentPage, sortOrder, fetchChaptersData]);
+    setDisplayChapters(filtered);
+  }, [searchChapter, allChapters]);
 
-  // 3. LOAD DETAIL MANGA (Sekali saja saat ID ada)
-  useEffect(() => {
-    if (!id) return;
-    fetch(`https://api.shngm.io/v1/manga/detail/${id}`)
-      .then(res => res.json())
-      .then(result => setManga(result.data))
-      .catch(err => console.error(err));
-  }, [id]);
-
-  // --- SISANYA LOGIKA UI (Bookmark, Click, dll) ---
-
+  // 3. BOOKMARK LOGIC
   useEffect(() => {
     if (!id) return;
     const bookmarks = JSON.parse(localStorage.getItem('nonton_yuk_bookmarks') || '[]');
@@ -81,7 +74,9 @@ export default function DetailKomik() {
     setIsBookmarked(!isBookmarked);
   };
 
+  // 4. CHAPTER CLICK & HISTORY
   const handleChapterClick = (ch) => {
+    if (!manga) return;
     const history = JSON.parse(localStorage.getItem('nonton_yuk_history') || '[]');
     const newHistory = [{ 
       mangaId: id, chapterId: ch.chapter_id, chapterNum: ch.chapter_number, 
@@ -120,6 +115,7 @@ export default function DetailKomik() {
         </div>
       </nav>
 
+      {/* Hero Section */}
       <div className="relative pt-20 overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-[500px] pointer-events-none">
           <img src={manga?.cover_image_url} className="w-full h-full object-cover opacity-20 blur-3xl scale-150" alt="" />
@@ -133,12 +129,16 @@ export default function DetailKomik() {
             </div>
             <div className="flex-1 pt-4">
                 <div className="space-y-3 mb-6">
+                    <div className="flex flex-wrap gap-2">
+                      <span className="bg-yellow-500 text-black px-3 py-1 rounded-lg text-[10px] font-black uppercase">{manga?.taxonomy?.Format?.[0]?.name || 'Manhwa'}</span>
+                      <span className="bg-white/10 px-3 py-1 rounded-lg text-[10px] font-bold text-gray-300 uppercase">{manga?.status === 1 ? 'ONGOING' : 'COMPLETED'}</span>
+                    </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">{manga?.title}</h1>
                     <p className="text-yellow-500 font-bold text-lg italic opacity-80">{manga?.taxonomy?.Author?.[0]?.name}</p>
                 </div>
                 <div className="max-w-2xl bg-white/5 p-6 rounded-3xl border border-white/5">
                     <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-3 italic">Synopsis</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-500">{manga?.description}</p>
+                    <p className="text-sm text-gray-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-500">{manga?.description || 'Tidak ada deskripsi.'}</p>
                 </div>
             </div>
         </div>
@@ -156,6 +156,7 @@ export default function DetailKomik() {
               <div className="relative flex-1 lg:w-48">
                 <input 
                   type="text" 
+                  inputMode="numeric"
                   placeholder="Cari Ch..."
                   value={searchChapter}
                   onChange={(e) => setSearchChapter(e.target.value)}
@@ -175,11 +176,13 @@ export default function DetailKomik() {
                 </div>
             )}
             
-            {chapters.length > 0 ? chapters.map((ch) => (
+            {displayChapters.length > 0 ? displayChapters.map((ch) => (
               <button key={ch.chapter_id} onClick={() => handleChapterClick(ch)} className="flex items-center justify-between p-5 rounded-[1.5rem] bg-[#0a0a0d] border border-white/5 hover:border-yellow-500 transition-all group">
                 <div>
                   <span className="text-sm font-black group-hover:text-yellow-500 uppercase italic">Chapter {ch.chapter_number}</span>
-                  <p className="text-[10px] font-bold text-gray-600 uppercase mt-1 italic">{new Date(ch.release_date).toLocaleDateString('id-ID')}</p>
+                  <p className="text-[10px] font-bold text-gray-600 uppercase mt-1 italic tracking-tighter">
+                    {new Date(ch.release_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black transition-all">
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -192,12 +195,12 @@ export default function DetailKomik() {
             )}
           </div>
 
-          {/* Pagination Sembunyi kalau lagi nyari */}
-          {!searchChapter && chapters.length > 0 && (
+          {/* Pagination hanya muncul jika tidak sedang mencari */}
+          {!searchChapter && displayChapters.length >= pageSize && (
             <div className="mt-12 flex items-center justify-center gap-6">
               <button disabled={currentPage === 1 || loading} onClick={() => setCurrentPage(p => p - 1)} className="px-8 py-4 rounded-2xl font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all">← Prev</button>
-              <div className="w-14 h-14 flex items-center justify-center rounded-2xl border-2 border-yellow-500 font-black text-xl text-yellow-500 italic">{currentPage}</div>
-              <button disabled={chapters.length < pageSize || loading} onClick={() => setCurrentPage(p => p + 1)} className="px-8 py-4 rounded-2xl font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all">Next →</button>
+              <div className="w-14 h-14 flex items-center justify-center rounded-2xl border-2 border-yellow-500 font-black text-xl text-yellow-500 italic shadow-[5px_5px_0px_#ea7e08]">{currentPage}</div>
+              <button disabled={displayChapters.length < pageSize || loading} onClick={() => setCurrentPage(p => p + 1)} className="px-8 py-4 rounded-2xl font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all">Next →</button>
             </div>
           )}
         </div>
