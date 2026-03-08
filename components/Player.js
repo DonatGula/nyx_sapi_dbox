@@ -1,43 +1,75 @@
 // components/Player.js
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Hls from 'hls.js';
 
-export default function Player({ url, poster }) {
+const Player = forwardRef(({ url, poster, onEnded, onTimeUpdate }, ref) => {
   const videoRef = useRef(null);
-  const isHls = url?.includes('.m3u8');
+  // Check for common video extensions or HLS manifest
+  const isDirectVideo = url && /\.(mp4|m3u8|webm|ogg)$/i.test(url);
+  const isHls = url && /\.m3u8$/i.test(url);
 
   useEffect(() => {
-    if (isHls && url && videoRef.current) {
-      if (Hls.isSupported()) {
+    const videoElement = videoRef.current;
+    if (!videoElement || !isDirectVideo) return;
+
+    if (isHls && Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
-        hls.attachMedia(videoRef.current);
-        return () => hls.destroy();
-      } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-        videoRef.current.src = url;
+        hls.attachMedia(videoElement);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          videoElement.play().catch(() => {});
+        });
+        return () => {
+            hls.destroy();
+            // videoElement.removeAttribute('src'); // Optional: clear src
+        };
+    } else {
+      // For native HLS support (Safari) or other direct video files (mp4, webm)
+      videoElement.src = url;
+    }
+  }, [url, isHls, isDirectVideo]);
+
+  useImperativeHandle(ref, () => ({
+    requestPip: () => {
+      const videoElement = videoRef.current;
+      if (videoElement && document.pictureInPictureEnabled && !videoElement.disablePictureInPicture) {
+        try {
+          if (document.pictureInPictureElement) {
+            document.exitPictureInPicture();
+          } else {
+            videoElement.requestPictureInPicture();
+          }
+        } catch (error) {
+          console.error("PiP Error:", error);
+        }
       }
     }
-  }, [url, isHls]);
+  }));
 
   return (
     <div className="w-full aspect-video bg-black relative">
-      {isHls ? (
+      {isDirectVideo ? (
               // Di dalam Player.js Paman
         <video
           ref={videoRef}
-          onEnded={props.onEnded} // INI YANG PENTING
+          onEnded={onEnded}
+          onTimeUpdate={onTimeUpdate}
           className="w-full h-full"
           controls
-          poster={props.poster}
+          poster={poster}
+          autoPlay
         />
       ) : (
         <iframe 
-          src={url} 
+          src={url ? (url.includes('autoplay=1') ? url : (url.includes('?') ? `${url}&autoplay=1` : `${url}?autoplay=1`)) : url}
           className="w-full h-full border-0" 
           allowFullScreen 
-          sandbox="allow-scripts allow-same-origin allow-forms"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
         />
       )}
     </div>
   );
-}
+});
+
+export default Player;
