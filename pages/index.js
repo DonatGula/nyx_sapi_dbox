@@ -146,7 +146,7 @@ export default function Home() {
 
       {/* STICKY NAVBAR - YouTube Style */}
       <nav className={`fixed top-0 w-full z-50 transition-colors ${isDark ? 'bg-[#101010]/80 backdrop-blur-lg border-b border-white/5' : 'bg-white/80 backdrop-blur-lg border-b border-gray-200'}`}>
-        <div className="mx-auto flex items-center justify-between gap-4 p-3 px-6">
+        <div className="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center justify-between gap-2 px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-6">
           {/* Left Side: Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
             <img src="/logo/logo.webp" alt="Nonton-Yuk Logo" className="h-8 w-auto filter drop-shadow-[0_0_3px_#FF2D85]" />
@@ -156,7 +156,7 @@ export default function Home() {
           </Link>
             
           {/* Center: Search Bar */}
-          <div className="flex-1 flex justify-center px-4">
+          <div className="order-3 flex w-full justify-center px-0 sm:order-none sm:w-auto sm:flex-1 sm:px-4">
             <div className="relative w-full max-w-lg group">
               <input 
                 type="text" 
@@ -172,16 +172,16 @@ export default function Home() {
           </div>
          
           {/* Right Side: Actions */}
-          <div className="flex items-center gap-3 shrink-0">
-             <a href='/komik' target='_blank' rel='noopener noreferrer' className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+          <div className="flex items-center gap-1.5 shrink-0 sm:gap-3">
+             <a href='/komik' target='_blank' rel='noopener noreferrer' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
                Manga
             </a>
-            <Link href='/anime' className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+            <Link href='/anime' className={`text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
               Anime
             </Link>
             <button 
                 onClick={() => setIsDark(!isDark)}
-                className={`p-2.5 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
+                className={`min-h-10 min-w-10 p-2.5 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
             >
                 {isDark ? '☀️' : '🌙'}
             </button>
@@ -189,18 +189,18 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="pt-20">
+      <main className="pt-28 sm:pt-20">
         {/* HERO BANNER SLIDER */}
         {heroItem && (
-            <div className="relative w-full h-[50vh] md:h-[70vh] mb-8 overflow-hidden group">
+            <div className="relative w-full h-[58vh] min-h-[390px] max-h-[680px] md:h-[70vh] mb-5 sm:mb-8 overflow-hidden group">
                 <div className="absolute inset-0 transition-opacity duration-1000">
                     <img src={heroItem.poster} alt={heroItem.title} className="w-full h-full object-cover object-top opacity-60 blur-sm scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#101010] via-[#101010]/40 to-transparent" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#101010] via-[#101010]/40 to-transparent" />
                 </div>
-                <div className="absolute bottom-0 left-0 p-8 md:p-16 w-full max-w-4xl z-10">
+                <div className="absolute bottom-0 left-0 p-5 pb-8 sm:p-8 md:p-16 w-full max-w-4xl z-10">
                     <span className="px-3 py-1 bg-pink-600 text-white text-xs font-bold rounded-full uppercase tracking-wider mb-4 inline-block animate-pulse">Trending Now</span>
-                    <h1 className="text-4xl md:text-6xl font-black mb-4 leading-tight drop-shadow-lg line-clamp-2">{heroItem.title}</h1>
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-black mb-3 sm:mb-4 leading-tight drop-shadow-lg line-clamp-2">{heroItem.title}</h1>
                     <div className="flex items-center gap-4 text-sm md:text-base font-medium text-gray-300 mb-6">
                         <span>{heroItem.year}</span>
                         <span>•</span>
@@ -216,7 +216,7 @@ export default function Home() {
                     </Link>
                 </div>
                 {/* Slider Indicators */}
-                <div className="absolute bottom-8 right-8 flex gap-2 z-20">
+                <div className="absolute bottom-4 right-4 sm:bottom-8 sm:right-8 flex gap-2 z-20">
                     {[...Array(Math.min(items.length, 5))].map((_, idx) => (
                         <div 
                             key={idx} 
@@ -229,7 +229,7 @@ export default function Home() {
 
         {/* SCROLLABLE TAB SELECTOR - YouTube Chip Style */}
         {!search && (
-          <div className={`sticky top-[72px] z-40 py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 transition-colors ${isDark ? 'bg-[#101010]/80 backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm'}`}>
+          <div className={`sticky top-[112px] sm:top-[72px] z-40 py-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 transition-colors ${isDark ? 'bg-[#101010]/80 backdrop-blur-sm' : 'bg-white/80 backdrop-blur-sm'}`}>
             <div className="flex gap-3 overflow-x-auto no-scrollbar justify-start md:justify-center">
               {TABS.map(tab => (
                 <button 
@@ -299,7 +299,7 @@ export default function Home() {
         )}
 
         {/* GRID LAYOUT */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 pb-8">
           {loading && items.length === 0 ? (
              [...Array(12)].map((_, i) => (
                <div key={i}>
@@ -350,7 +350,7 @@ export default function Home() {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className={`fixed bottom-8 right-8 p-3 rounded-full shadow-lg transition-all duration-300 z-50 ${isDark ? 'bg-pink-600 text-white hover:bg-pink-500' : 'bg-pink-500 text-white hover:bg-pink-600'}`}
+          className={`fixed bottom-5 right-4 sm:bottom-8 sm:right-8 p-3 rounded-full shadow-lg transition-all duration-300 z-50 ${isDark ? 'bg-pink-600 text-white hover:bg-pink-500' : 'bg-pink-500 text-white hover:bg-pink-600'}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
