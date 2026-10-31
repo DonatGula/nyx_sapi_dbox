@@ -24,7 +24,7 @@ img, video { height: auto; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 button, select, a { touch-action: manipulation; }
 button { cursor: pointer; }
-button:disabled { cursor: not--allowed; }
+button:disabled { cursor: not-allowed; }
 input, select, textarea { min-width: 0; max-width: 100%; }
 :focus-visible { outline: 2px solid #ec4899; outline-offset: 3px; }
 .no-scrollbar, .custom-scrollbar {
