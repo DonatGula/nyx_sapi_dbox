@@ -1,21 +1,63 @@
 @import "tailwindcss";
 
-/* Mobile-first global defaults */
-@layer base {
-  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body {
-    @apply bg-[#050507] text-white selection:bg-red-600;
-    overflow-x: hidden;
-    min-width: 320px;
-  }
-  button, a, input, select { -webkit-tap-highlight-color: transparent; }
-  button, select { touch-action: manipulation; }
-  img, video, iframe { max-width: 100%; }
+/* App-wide responsive foundation */
+:root {
+  color-scheme: dark;
+  --app-gutter: clamp(12px, 3.5vw, 32px);
 }
+* { box-sizing: border-box; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+body {
+  @apply bg-[#050507] text-white selection:bg-red-600;
+  margin: 0;
+  min-width: 320px;
+  max-width: 100%;
+  overflow-x: clip;
+}
+#__next { min-height: 100vh; width: 100%; overflow-x: clip; }
+img, video, iframe, canvas, svg { max-width: 100%; }
+img, video { height: auto; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, select, a { touch-action: manipulation; }
+button { cursor: pointer; }
+button:disabled { cursor: not--allowed; }
+input, select, textarea { min-width: 0; max-width: 100%; }
+:focus-visible { outline: 2px solid #ec4899; outline-offset: 3px; }
+.no-scrollbar, .custom-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { display: none; }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Keep embeds and media fluid instead of overflowing their parent */
+iframe { display: block; }
+video { object-fit: contain; }
+.aspect-video { position: relative; }
+main { min-width: 0; }
+section, article, header, nav, footer { min-width: 0; }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
+  html { scroll-padding-top: 76px; }
+  body { font-size: 14px; }
   input, select, textarea { font-size: 16px; }
+  button, [role="button"] { min-height: 40px; }
+  main { max-width: 100%; }
+  h1 { overflow-wrap: anywhere; }
+  .aspect-video iframe, .aspect-video video { width: 100%; height: 100%; }
+  /* Avoid fixed-width desktop containers creating horizontal page scroll */
+  .container, .max-w-7xl, .max-w-6xl, .max-w-screen-2xl { max-width: 100%; }
+}
+@media (max-width: 480px) {
+  :root { --app-gutter: 12px; }
+  .rounded-3xl { border-radius: 1rem; }
+  .rounded-2xl { border-radius: .875rem; }
+  /* Long metadata and headings should wrap rather than widen the viewport */
+  p, h2, h3, h4, label { overflow-wrap: anywhere; }
+}
+@supports (padding: max(0px)) {
+  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 }
