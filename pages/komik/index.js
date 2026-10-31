@@ -81,14 +81,14 @@ export default function KomikHome() {
       </Head>
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 w-full z-[60] bg-[#0a0a0d]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+      <nav className="fixed top-0 inset-x-0 z-[60] bg-[#0a0a0d]/95 backdrop-blur-xl border-b border-white/5 px-3 py-3 sm:px-6 sm:py-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 sm:gap-6">
           <Link href="/komik" className="flex items-center gap-2 group">
             <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center font-black text-black group-hover:rotate-12 transition-transform">N</div>
             <h1 className="text-xl font-black uppercase tracking-tighter italic">Manga</h1>
           </Link>
           
-          <div className="relative flex-1 max-w-md group">
+          <div className="relative order-3 w-full min-w-0 max-w-none group sm:order-none sm:flex-1 sm:max-w-md">
             <svg className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${searchTerm ? 'text-yellow-500' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -109,20 +109,20 @@ export default function KomikHome() {
                 </button>
             )}
             </div>
-            <div className="flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <div className="hidden sm:flex gap-4 md:gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
              <Link href="/" className="hover:text-red-500 transition hidden sm:block">NONTON-YUK</Link>
           </div>
         </div>
       </nav>
 
-      <main className="pt-28 pb-20 px-6 max-w-7xl mx-auto">
+      <main className="pt-28 pb-20 px-3 sm:px-6 max-w-7xl mx-auto">
 
         {/* CONTINUE READING */}
         {!search && mangaHistory.length > 0 && (
             <section className="mb-16">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <h3 className="font-black text-2xl flex items-center gap-3 uppercase tracking-tighter italic">
+                        <h3 className="font-black text-lg sm:text-2xl flex items-center gap-2 sm:gap-3 uppercase tracking-tighter italic">
                             <span className="w-2 h-8 bg-red-500 rounded-full"></span>
                             Continue Reading
                         </h3>
@@ -138,7 +138,7 @@ export default function KomikHome() {
                                 <div className="aspect-[3/4.5] rounded-3xl overflow-hidden border border-white/5 group-hover:border-yellow-500/50 transition-all duration-500 relative">
                                     <img src={item.mangaCover} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt={item.mangaTitle} />
                                 </div>
-                                <h4 className="mt-4 text-sm font-bold line-clamp-1 group-hover:text-yellow-500 transition-colors">{item.mangaTitle}</h4>
+                                <h4 className="mt-2 sm:mt-4 text-xs sm:text-sm font-bold line-clamp-2 group-hover:text-yellow-500 transition-colors">{item.mangaTitle}</h4>
                                 <p className="text-xs text-gray-400 font-semibold">Chapter {item.lastChapterNumber}</p>
                             </div>
                         </Link>
@@ -224,7 +224,7 @@ export default function KomikHome() {
         )}
 
         {/* SECTION LATEST UPDATES / SEARCH RESULTS */}
-         <div className="flex items-center justify-between mb-8">
+         <div className="flex items-center justify-between gap-3 mb-5 sm:mb-8">
             <h3 className="font-black text-2xl flex items-center gap-3 uppercase tracking-tighter italic">
               <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
               {search ? `Hasil: "${search}"` : 'Latest Updates'}
@@ -281,7 +281,7 @@ export default function KomikHome() {
           )}
         </section>
         {/* PAGINATION */}
-        <div className="mt-20 flex items-center justify-center gap-8">
+        <div className="mt-12 sm:mt-20 flex items-center justify-center gap-5 sm:gap-8">
           <button
             disabled={page === 1}
             onClick={() => { setPage(p => p - 1); window.scrollTo(0,0); }}
