@@ -15,13 +15,13 @@ export default function MovieCard({ item, isDark }) {
           />
         </div>
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300"></div>
         {/* Info */}
-        <div className="absolute bottom-0 left-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 w-full">
-          <h3 className="text-base font-bold text-white leading-tight line-clamp-2">
+        <div className="absolute bottom-0 left-0 p-2.5 sm:p-4 transform translate-y-0 sm:translate-y-4 sm:group-hover:translate-y-0 transition-transform duration-300 w-full">
+          <h3 className="text-sm sm:text-base font-bold text-white leading-tight line-clamp-2">
             {item.title}
           </h3>
-          <p className="text-xs text-gray-300 mt-1">{item.type} &bull; {item.year}</p>
+          <p className="text-xs text-gray-300 mt-0.5 sm:mt-1">{item.type} &bull; {item.year}</p>
         </div>
         {item.rating && (
           <span className="absolute top-2 right-2 bg-black/70 text-white text-xs font-bold px-2 py-1 rounded-full">
