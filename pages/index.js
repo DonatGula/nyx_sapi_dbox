@@ -176,6 +176,9 @@ export default function Home() {
              <a href='/komik' target='_blank' rel='noopener noreferrer' className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
                Manga
             </a>
+            <Link href='/anime' className={`text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+              Anime
+            </Link>
             <button 
                 onClick={() => setIsDark(!isDark)}
                 className={`p-2.5 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800' : 'hover:bg-gray-200'}`}
