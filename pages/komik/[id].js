@@ -109,8 +109,8 @@ export default function DetailKomik() {
         <meta name="referrer" content="no-referrer" />
       </Head>
 
-      <nav className="fixed top-0 w-full z-[70] bg-[#0a0a0d]/80 backdrop-blur-lg border-b border-white/5 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <nav className="fixed top-0 inset-x-0 z-[70] bg-[#0a0a0d]/95 backdrop-blur-lg border-b border-white/5 px-3 py-3 sm:px-6 sm:py-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <button onClick={() => router.back()} className="p-2 hover:bg-white/5 rounded-xl transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
@@ -125,18 +125,18 @@ export default function DetailKomik() {
           <img src={manga?.cover_image_url} className="w-full h-full object-cover opacity-20 blur-3xl scale-150" alt="" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0d] via-transparent to-transparent"></div>
         </div>
-        <div className="relative max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row gap-8 lg:gap-12">
-            <div className="w-full md:w-64 flex-shrink-0">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-5 sm:py-8 flex flex-col md:flex-row gap-5 sm:gap-8 lg:gap-12">
+            <div className="w-40 sm:w-56 md:w-64 mx-auto md:mx-0 flex-shrink-0">
                 <div className="relative aspect-[3/4] rounded-3xl overflow-hidden border-2 border-white/10 shadow-2xl">
                     <img src={manga?.cover_image_url} className="w-full h-full object-cover" alt={manga?.title} />
                 </div>
             </div>
             <div className="flex-1 pt-4">
                 <div className="space-y-3 mb-6">
-                    <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">{manga?.title}</h1>
+                    <h1 className="text-2xl sm:text-4xl md:text-6xl font-black tracking-tighter uppercase italic leading-tight">{manga?.title}</h1>
                     <p className="text-yellow-500 font-bold text-lg italic opacity-80">{manga?.taxonomy?.Author?.[0]?.name}</p>
                 </div>
-                <div className="max-w-2xl bg-white/5 p-6 rounded-3xl border border-white/5">
+                <div className="max-w-2xl bg-white/5 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/5">
                     <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-3 italic">Synopsis</h3>
                     <p className="text-sm text-gray-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all duration-500">{manga?.description}</p>
                 </div>
@@ -144,15 +144,15 @@ export default function DetailKomik() {
         </div>
       </div>
 
-      <div id="chapter-list" className="max-w-6xl mx-auto px-6 mt-12">
-        <div className="bg-[#16161e]/40 border border-white/5 rounded-[2.5rem] p-6 md:p-10 backdrop-blur-md">
+      <div id="chapter-list" className="max-w-6xl mx-auto px-3 sm:px-6 mt-7 sm:mt-12">
+        <div className="bg-[#16161e]/40 border border-white/5 rounded-2xl sm:rounded-[2.5rem] p-3 sm:p-6 md:p-10 backdrop-blur-md">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-10">
             <div className="flex items-center gap-4">
               <div className="w-2 h-8 bg-yellow-500 rounded-full shadow-[0_0_15px_#ea7e08]"></div>
-              <h3 className="text-2xl font-black uppercase tracking-tighter italic">Chapter List</h3>
+              <h3 className="text-lg sm:text-2xl font-black uppercase tracking-tighter italic">Chapter List</h3>
             </div>
             
-            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-48">
                 <input 
                   type="text" 
@@ -194,7 +194,7 @@ export default function DetailKomik() {
 
           {/* Pagination Sembunyi kalau lagi nyari */}
           {!searchChapter && chapters.length > 0 && (
-            <div className="mt-12 flex items-center justify-center gap-6">
+            <div className="mt-8 sm:mt-12 flex items-center justify-center gap-3 sm:gap-6">
               <button disabled={currentPage === 1 || loading} onClick={() => setCurrentPage(p => p - 1)} className="px-8 py-4 rounded-2xl font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all">← Prev</button>
               <div className="w-14 h-14 flex items-center justify-center rounded-2xl border-2 border-yellow-500 font-black text-xl text-yellow-500 italic">{currentPage}</div>
               <button disabled={chapters.length < pageSize || loading} onClick={() => setCurrentPage(p => p + 1)} className="px-8 py-4 rounded-2xl font-black text-[11px] uppercase bg-white/5 border border-white/10 disabled:opacity-20 hover:bg-yellow-500 hover:text-black transition-all">Next →</button>
