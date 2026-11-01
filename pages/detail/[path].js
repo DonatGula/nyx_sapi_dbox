@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Head from 'next/head';
 import Player from '../../components/Player';
 import MovieCard from '../../components/MovieCard';
+import { readLocalStorage } from '../../lib/storage';
 
 export default function DetailPage() {
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function DetailPage() {
   const saveHistory = useCallback((dataToSave) => {
     if (!path || !movie) return;
     try {
-      const history = JSON.parse(localStorage.getItem('movieHistory')) || {};
+      const history = readLocalStorage('movieHistory', {});
       const existingData = history[path] || {};
       
       history[path] = {
@@ -56,7 +57,7 @@ export default function DetailPage() {
         const newWatchedState = { ...prevWatched, [seasonKey]: newWatchedForSeason };
 
         try {
-            const allWatchedData = JSON.parse(localStorage.getItem('watchedEpisodes')) || {};
+            const allWatchedData = readLocalStorage('watchedEpisodes', {});
             allWatchedData[path] = newWatchedState;
             localStorage.setItem('watchedEpisodes', JSON.stringify(allWatchedData));
         } catch (error) {}
