@@ -1,24 +1,38 @@
 @import "tailwindcss";
 
-/* App-wide responsive foundation */
+/* Nonton-Yuk design system: shared responsive foundation */
 :root {
   color-scheme: dark;
-  --app-gutter: clamp(12px, 3.5vw, 32px);
+  --app-bg: #08090f;
+  --app-surface: #11131d;
+  --app-surface-raised: #191c29;
+  --app-border: rgba(255,255,255,.09);
+  --app-muted: #9ca3af;
+  --app-accent: #ec4899;
+  --app-gutter: clamp(14px, 3.5vw, 36px);
 }
 * { box-sizing: border-box; }
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  background: var(--app-bg);
 }
 body {
-  @apply bg-[#050507] text-white selection:bg-red-600;
   margin: 0;
   min-width: 320px;
   max-width: 100%;
   overflow-x: clip;
+  color: #f8fafc;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(190,24,93,.13), transparent 32rem),
+    radial-gradient(ellipse at 92% 12%, rgba(79,70,229,.10), transparent 28rem),
+    var(--app-bg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
-#__next { min-height: 100vh; width: 100%; overflow-x: clip; }
+#__next { min-height: 100vh; width: 100%; overflow-x: clip; isolation: isolate; }
 img, video, iframe, canvas, svg { max-width: 100%; }
 img, video { height: auto; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
@@ -26,42 +40,68 @@ button, select, a { touch-action: manipulation; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 input, select, textarea { min-width: 0; max-width: 100%; }
-:focus-visible { outline: 2px solid #ec4899; outline-offset: 3px; }
-.no-scrollbar, .custom-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { display: none; }
+a { text-decoration: none; }
+:focus-visible { outline: 2px solid #f472b6; outline-offset: 3px; }
+::selection { background: rgba(236,72,153,.35); color: #fff; }
 
-/* Keep embeds and media fluid instead of overflowing their parent */
+/* Shared navigation and page surfaces */
+body nav, body header {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+body nav {
+  box-shadow: 0 10px 35px rgba(0,0,0,.16);
+}
+main { min-width: 0; }
+section, article, header, nav, footer { min-width: 0; }
+main > h1, main > h2 { letter-spacing: -.035em; }
+main input:not([type="checkbox"]), main select,
+body nav input, body header input {
+  border-color: var(--app-border);
+  transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+main input:focus, main select:focus, body nav input:focus, body header input:focus {
+  border-color: rgba(236,72,153,.75);
+  box-shadow: 0 0 0 3px rgba(236,72,153,.12);
+  outline: none;
+}
+
+/* Unified cards for movie, anime and manga catalogues */
+main .grid > a,
+main .grid > button,
+main .grid > div > a {
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+main .grid > a:hover,
+main .grid > button:hover,
+main .grid > div > a:hover {
+  transform: translateY(-3px);
+  border-color: rgba(236,72,153,.32);
+  box-shadow: 0 16px 36px rgba(0,0,0,.26), 0 0 22px rgba(236,72,153,.07);
+}
+main .grid img { display: block; }
+main .grid > a > div:first-child,
+main .grid > button > div:first-child { overflow: hidden; }
+main .grid > a h2, main .grid > a h3, main .grid > a h4,
+main .grid > button h2, main .grid > button h3, main .grid > button h4 {
+  overflow-wrap: anywhere;
+}
+
+/* Consistent interactive controls without overriding their semantic colors */
+button, [role="button"] { transition-property: color, background-color, border-color, box-shadow, transform, opacity; }
+button:active:not(:disabled) { transform: translateY(1px); }
+.no-scrollbar, .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar, .custom-scrollbar::-webkit-scrollbar { display: none; }
 iframe { display: block; }
 video { object-fit: contain; }
 .aspect-video { position: relative; }
-main { min-width: 0; }
-section, article, header, nav, footer { min-width: 0; }
-
-@media (max-width: 767px) {
-  html { scroll-padding-top: 76px; }
-  body { font-size: 14px; }
-  input, select, textarea { font-size: 16px; }
-  button, [role="button"] { min-height: 40px; }
-  main { max-width: 100%; }
-  h1 { overflow-wrap: anywhere; }
-  .aspect-video iframe, .aspect-video video { width: 100%; height: 100%; }
-  /* Avoid fixed-width desktop containers creating horizontal page scroll */
-  .container, .max-w-7xl, .max-w-6xl, .max-w-screen-2xl { max-width: 100%; }
-}
-@media (max-width: 480px) {
-  :root { --app-gutter: 12px; }
-  .rounded-3xl { border-radius: 1rem; }
-  .rounded-2xl { border-radius: .875rem; }
-  /* Long metadata and headings should wrap rather than widen the viewport */
-  p, h2, h3, h4, label { overflow-wrap: anywhere; }
-}
-@supports (padding: max(0px)) {
-  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
-}
-
+.aspect-video iframe, .aspect-video video { width: 100%; height: 100%; }
+hr { border-color: var(--app-border); }
 
 /* Keep the navbar brand mark contained and prevent oversized logo rendering. */
 .brand-logo {
@@ -72,4 +112,29 @@ section, article, header, nav, footer { min-width: 0; }
   object-fit: contain;
   object-position: center;
   flex: 0 0 32px;
+}
+
+@media (max-width: 767px) {
+  html { scroll-padding-top: 78px; }
+  body { font-size: 14px; }
+  input, select, textarea { font-size: 16px; }
+  button, [role="button"] { min-height: 40px; }
+  main { max-width: 100%; }
+  h1 { overflow-wrap: anywhere; }
+  .aspect-video iframe, .aspect-video video { width: 100%; height: 100%; }
+  .container, .max-w-7xl, .max-w-6xl, .max-w-screen-2xl { max-width: 100%; }
+  main .grid { column-gap: 10px; row-gap: 12px; }
+  main .grid > a, main .grid > button, main .grid > div > a { border-radius: 13px; }
+}
+@media (max-width: 480px) {
+  :root { --app-gutter: 12px; }
+  .rounded-3xl { border-radius: 1rem; }
+  .rounded-2xl { border-radius: .875rem; }
+  p, h2, h3, h4, label { overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@supports (padding: max(0px)) {
+  body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 }
