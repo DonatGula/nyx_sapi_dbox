@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
+const readStoredObject = (key) => {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '{}');
+    return value && typeof value === 'object' ? value : {};
+  } catch {
+    return {};
+  }
+};
+
 export default function KomikHome() {
   const [mangaList, setMangaList]   = useState([]);
   const [topManga, setTopManga]     = useState([]);
@@ -22,15 +31,22 @@ export default function KomikHome() {
     }, [searchTerm]);
  
     useEffect(() => {
+        const controller = new AbortController();
         setLoading(true);
-        fetch(`https://api.shngm.io/v1/manga/list?page=${page}&page_size=24&sort=latest&q=${search}`)
-        .then(res => res.json())
+        fetch(`https://api.shngm.io/v1/manga/list?page=${page}&page_size=24&sort=latest&q=${encodeURIComponent(search)}`, { signal: controller.signal })
+        .then(res => {
+            if (!res.ok) throw new Error('Gagal memuat katalog komik');
+            return res.json();
+        })
         .then(res => {
             setMangaList(res.data || []);
             setMeta(res.meta || {});
             setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch(error => {
+            if (error.name !== 'AbortError') setLoading(false);
+        });
+        return () => controller.abort();
     }, [page, search]);
 
   
@@ -45,13 +61,13 @@ export default function KomikHome() {
 );
 
     useEffect(() => {
-        const storedBookmarks = JSON.parse(localStorage.getItem('mangaBookmarks')) || {};
+        const storedBookmarks = readStoredObject('mangaBookmarks');
         const sortedBookmarks = Object.values(storedBookmarks).sort((a, b) => b.timestamp - a.timestamp);
         setBookmarks(sortedBookmarks);
     }, []);
 
     useEffect(() => {
-        const storedMangaHistory = JSON.parse(localStorage.getItem('mangaHistory')) || {};
+        const storedMangaHistory = readStoredObject('mangaHistory');
         const sortedHistory = Object.values(storedMangaHistory).sort((a, b) => b.timestamp - a.timestamp);
         setMangaHistory(sortedHistory);
     }, []);
@@ -77,7 +93,6 @@ export default function KomikHome() {
       <Head>
         <title>N-Studio Manga | Baca Manhwa Terlengkap</title>
         <meta name="referrer" content="no-referrer" />
-        <script src="https://cdn.tailwindcss.com"></script>
       </Head>
 
       {/* NAVBAR */}
@@ -311,14 +326,10 @@ export default function KomikHome() {
         </div>
       </main>
 
-      {/* LOADING OVERLAY */}
+      {/* Non-blocking loading indicator; keep the catalogue usable while refreshing. */}
       {loading && (
-        <div className="fixed inset-0 bg-[#0a0a0d]/90 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-yellow-500/20 rounded-full"></div>
-            <div className="absolute top-0 w-16 h-16 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="mt-6 text-[11px] font-black tracking-[0.5em] text-yellow-500 animate-pulse">SYSTEM UPDATING...</p>
+        <div className="fixed inset-x-0 top-0 z-[80] h-1 bg-yellow-500/15" role="status" aria-label="Memuat katalog">
+          <div className="h-full w-1/3 animate-pulse rounded-full bg-yellow-400" />
         </div>
       )}
 
