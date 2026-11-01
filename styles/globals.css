@@ -61,3 +61,15 @@ section, article, header, nav, footer { min-width: 0; }
 @supports (padding: max(0px)) {
   body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 }
+
+
+/* Keep the navbar brand mark contained and prevent oversized logo rendering. */
+.brand-logo {
+  display: block;
+  width: 32px;
+  height: 32px;
+  max-width: 32px;
+  object-fit: contain;
+  object-position: center;
+  flex: 0 0 32px;
+}
