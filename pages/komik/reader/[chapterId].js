@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
+import { readLocalStorage } from '../../../lib/storage';
 
 export default function ReaderKomik() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function ReaderKomik() {
   // 2. Simpan Riwayat Otomatis saat Chapter Berhasil Dimuat
   useEffect(() => {
     if (chapter) {
-      const history = JSON.parse(localStorage.getItem('nonton_yuk_history') || '[]');
+      const history = readLocalStorage('nonton_yuk_history', []);
       const newHistory = [
         { 
           mangaId: chapter.manga_id, 
