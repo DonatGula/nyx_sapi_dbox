@@ -149,7 +149,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-screen-2xl flex-wrap items-center justify-between gap-2 px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-6">
           {/* Left Side: Logo */}
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <img src="/logo/logo.webp" alt="Nonton-Yuk Logo" className="h-8 w-auto filter drop-shadow-[0_0_3px_#FF2D85]" />
+            <img src="/logo/logo.webp" alt="Nonton-Yuk Logo" className="brand-logo filter drop-shadow-[0_0_3px_#FF2D85]" />
             <h1 className="text-xl font-semibold tracking-tighter hidden sm:block">
               Nonton<span className="text-[#FF2D85]">-</span>Yuk
             </h1>

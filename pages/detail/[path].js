@@ -341,7 +341,7 @@ export default function DetailPage() {
       {/* NAVBAR */}
       <nav className={`fixed top-0 w-full z-50 px-6 py-3 flex items-center justify-between transition-colors ${isDark ? 'bg-black/95 border-b border-gray-800' : 'bg-white/95 border-b border-gray-200'} ${cinemaMode ? 'z-0 opacity-20 hover:opacity-100 transition-opacity' : 'z-50'}`}>
         <div className="flex items-center gap-2 cursor-pointer group" onClick={() => router.push('/')}>
-           <img src="/logo/logo.webp" alt="Logo" className="h-8 w-auto filter drop-shadow-[0_0_3px_#FF2D85]" />
+           <img src="/logo/logo.webp" alt="Logo" className="brand-logo filter drop-shadow-[0_0_3px_#FF2D85]" />
            <span className="font-semibold text-xl tracking-tighter hidden sm:block">Nonton<span className="text-[#FF2D85]">-Yuk</span></span>
         </div>
 
