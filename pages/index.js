@@ -173,9 +173,12 @@ export default function Home() {
          
           {/* Right Side: Actions */}
           <div className="flex items-center gap-1.5 shrink-0 sm:gap-3">
-             <a href='/komik' target='_blank' rel='noopener noreferrer' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
-               Manga
-            </a>
+             <Link href='/movies' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+              Movies
+            </Link>
+            <Link href='/komik' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+              Manga
+            </Link>
             <Link href='/anime' className={`text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
               Anime
             </Link>
