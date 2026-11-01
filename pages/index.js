@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import MovieCard from '../components/MovieCard';
+import { readLocalStorage } from '../lib/storage';
 
 const TABS = [
   { id: 'favorites', label: 'Favorites' },
@@ -27,7 +28,7 @@ export default function Home() {
 
   const loadData = useCallback(async (action, pageNum = 1, query = '', append = false) => {
     if (action === 'favorites') {
-      const favorites = JSON.parse(localStorage.getItem('movieFavorites')) || {};
+      const favorites = readLocalStorage('movieFavorites', {});
       const favItems = Object.values(favorites).sort((a, b) => b.timestamp - a.timestamp);
       setItems(favItems);
       setHasMore(false);
@@ -68,7 +69,7 @@ export default function Home() {
 
   // Load History
   useEffect(() => {
-    const history = JSON.parse(localStorage.getItem('movieHistory')) || {};
+    const history = readLocalStorage('movieHistory', {});
     const sortedHistory = Object.values(history)
       .filter(item => item.title && item.poster) // Only show items with valid metadata
       .sort((a, b) => b.timestamp - a.timestamp);
