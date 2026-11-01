@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import MovieCard from '../../components/MovieCard';
 
 export default function AnimeHome() {
   const [tab, setTab] = useState('popular');
@@ -27,7 +26,7 @@ export default function AnimeHome() {
     } catch (e) { setError(e.message); if (!append) setItems([]); }
     finally { setLoading(false); }
   }
-  useEffect(() => { load(1); }, [tab]);
+  useEffect(() => { if (!query.trim()) load(1); }, [tab]);
   useEffect(() => { const timer = setTimeout(() => load(1), 450); return () => clearTimeout(timer); }, [query]);
 
   return <div className="min-h-screen bg-[#09090d] text-white">
