@@ -1,15 +1,8 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { readLocalStorage } from '../../lib/storage';
 
-const readStoredObject = (key) => {
-  try {
-    const value = JSON.parse(localStorage.getItem(key) || '{}');
-    return value && typeof value === 'object' ? value : {};
-  } catch {
-    return {};
-  }
-};
 
 export default function KomikHome() {
   const [mangaList, setMangaList]   = useState([]);
@@ -61,13 +54,13 @@ export default function KomikHome() {
 );
 
     useEffect(() => {
-        const storedBookmarks = readStoredObject('mangaBookmarks');
+        const storedBookmarks = readLocalStorage('mangaBookmarks', {});
         const sortedBookmarks = Object.values(storedBookmarks).sort((a, b) => b.timestamp - a.timestamp);
         setBookmarks(sortedBookmarks);
     }, []);
 
     useEffect(() => {
-        const storedMangaHistory = readStoredObject('mangaHistory');
+        const storedMangaHistory = readLocalStorage('mangaHistory', {});
         const sortedHistory = Object.values(storedMangaHistory).sort((a, b) => b.timestamp - a.timestamp);
         setMangaHistory(sortedHistory);
     }, []);
