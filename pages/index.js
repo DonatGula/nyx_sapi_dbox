@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import MovieCard from '../components/MovieCard';
+import { readLocalStorage } from '../lib/storage';
 
 const TABS = [
   { id: 'favorites', label: 'Favorites' },
@@ -27,7 +28,7 @@ export default function Home() {
 
   const loadData = useCallback(async (action, pageNum = 1, query = '', append = false) => {
     if (action === 'favorites') {
-      const favorites = JSON.parse(localStorage.getItem('movieFavorites')) || {};
+      const favorites = readLocalStorage('movieFavorites', {});
       const favItems = Object.values(favorites).sort((a, b) => b.timestamp - a.timestamp);
       setItems(favItems);
       setHasMore(false);
@@ -68,7 +69,7 @@ export default function Home() {
 
   // Load History
   useEffect(() => {
-    const history = JSON.parse(localStorage.getItem('movieHistory')) || {};
+    const history = readLocalStorage('movieHistory', {});
     const sortedHistory = Object.values(history)
       .filter(item => item.title && item.poster) // Only show items with valid metadata
       .sort((a, b) => b.timestamp - a.timestamp);
@@ -173,9 +174,12 @@ export default function Home() {
          
           {/* Right Side: Actions */}
           <div className="flex items-center gap-1.5 shrink-0 sm:gap-3">
-             <a href='/komik' target='_blank' rel='noopener noreferrer' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
-               Manga
-            </a>
+             <Link href='/movies' className={`inline-flex text-[10px] sm:text-sm font-medium px-2 sm:px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+              Movies
+            </Link>
+            <Link href='/komik' className={`hidden sm:inline-flex text-sm font-medium px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
+              Manga
+            </Link>
             <Link href='/anime' className={`text-xs sm:text-sm font-medium px-3 sm:px-4 py-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10' : 'hover:bg-gray-200'}`}>
               Anime
             </Link>

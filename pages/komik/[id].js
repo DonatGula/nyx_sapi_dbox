@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { readLocalStorage } from '../../lib/storage';
 
 export default function DetailKomik() {
   const router = useRouter();
@@ -66,7 +67,7 @@ export default function DetailKomik() {
 
   useEffect(() => {
     if (!id) return;
-    const bookmarks = JSON.parse(localStorage.getItem('nonton_yuk_bookmarks') || '[]');
+    const bookmarks = readLocalStorage('nonton_yuk_bookmarks', []);
     setIsBookmarked(bookmarks.some(item => item.id === id));
   }, [id]);
 
@@ -82,7 +83,7 @@ export default function DetailKomik() {
   };
 
   const handleChapterClick = (ch) => {
-    const history = JSON.parse(localStorage.getItem('nonton_yuk_history') || '[]');
+    const history = readLocalStorage('nonton_yuk_history', []);
     const newHistory = [{ 
       mangaId: id, chapterId: ch.chapter_id, chapterNum: ch.chapter_number, 
       mangaTitle: manga.title, mangaCover: manga.cover_image_url, date: new Date() 

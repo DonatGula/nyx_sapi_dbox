@@ -1,18 +1,25 @@
 import Link from 'next/link';
 
 export default function MovieCard({ item, isDark }) {
-  const progress = item.duration > 0 ? (item.currentTime / item.duration) * 100 : 0;
+  const progress = item.duration > 0 ? Math.min(100, Math.max(0, (item.currentTime / item.duration) * 100)) : 0;
 
   return (
     <Link href={`/detail/${encodeURIComponent(item.detailPath)}`} legacyBehavior>
       <a className="group block cursor-pointer relative overflow-hidden rounded-xl">
         <div className="aspect-[2/3] w-full">
-          <img 
-            src={item.poster} 
-            alt={item.title} 
-            className={`w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}
-            loading="lazy"
-          />
+          {item.poster ? (
+            <img
+              src={item.poster}
+              alt={item.title || 'Poster'}
+              className={`w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-110 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#252536] to-[#11111a] p-4 text-center">
+              <span className="line-clamp-3 text-sm font-bold text-white/55">{item.title || 'Poster tidak tersedia'}</span>
+            </div>
+          )}
         </div>
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300"></div>
